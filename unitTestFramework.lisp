@@ -1,4 +1,3 @@
-
 (defvar *test-name* nil)
 (defvar *success* t)
 
