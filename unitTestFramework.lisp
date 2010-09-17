@@ -10,11 +10,16 @@
   "Define a test function. Within a test function we can call
    other test functions or use 'check' to run individual test
    cases."
-  `(defun ,name ,parameters
-    (let ((*test-name* (append *test-name* (list ',name)))
-	  (*success* t))
-      ,@body
-      *success*)))
+  (let ((doc))
+    (when (and (> (length body) 1) (stringp (car body)))
+      (setf doc (car body))
+      (setf body (cdr body)))
+    `(defun ,name ,parameters
+       ,doc
+       (let ((*test-name* (append *test-name* (list ',name)))
+	     (*success* t))
+	 ,@body
+	 *success*))))
 
 (defmacro check (&body forms)
   "Run each expression in 'forms' as a test case."
