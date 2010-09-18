@@ -10,15 +10,13 @@
   "Define a test function. Within a test function we can call
    other test functions or use 'check' to run individual test
    cases."
-  (let ((doc))
-    (when (and (> (length body) 1) (stringp (car body)))
-      (setf doc (car body))
-      (setf body (cdr body)))
+  (multiple-value-bind (forms decls doc) (sb-int::parse-body body)
     `(defun ,name ,parameters
        ,doc
+       ,@decls
        (let ((*test-name* (append *test-name* (list ',name)))
 	     (*success* t))
-	 ,@body
+	 ,@forms
 	 *success*))))
 
 (defmacro check (&body forms)
