@@ -1,7 +1,21 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  -*- mode: LISP; Syntax: COMMON-LISP;  Base: 10 -*-
+;;; 
+;;; Author      : Clayton Stanley
+;;; Address     : Air Force Research Laboratory
+;;;             : Mesa, AZ 85212 USA
+;;;             : clayton.stanley@wpafb.af.mil
+;;; Filename    : unitTestFramework.lisp
+;;; Version     : 1.0
+;;; 
+;;; Description : A Lisp-Based Unit Testing Framework. Most of the core was stolen from gigamonkeys.com UTF tutorial
+;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;chains all of the test names (name in deftest) that have been defined
 ;in the hierarchy; used when printing documentation for a 'check' test
 (defvar *test-name* nil)
+
 ;keeps track of the success for a test; if a hierarchy of tests are set up,
 ;when a test lower down in the hierarchy fails, the failure is propogated
 ;all the way up
