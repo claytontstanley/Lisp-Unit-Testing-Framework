@@ -1,15 +1,20 @@
+
+;chains all of the test names (name in deftest) that have been defined
+;in the hierarchy; used when printing documentation for a 'check' test
 (defvar *test-name* nil)
+;keeps track of the success for a test; if a hierarchy of tests are set up,
+;when a test lower down in the hierarchy fails, the failure is propogated
+;all the way up
 (defvar *success* t)
 
 (defmacro runtests (&body tests)
+  "top-level macro called to run a suite of tests"
   `(let ((*success* t))
      (combine-results ,@tests)
      *success*))
  
 (defmacro deftest (name parameters &body body)
-  "Define a test function. Within a test function we can call
-   other test functions or use 'check' to run individual test
-   cases."
+  "Define a test function. Within a test function we can call other test functions or use 'check' to run individual test cases."
   (multiple-value-bind (forms decls doc) (sb-int::parse-body body)
     `(defun ,name ,parameters
        ,doc
