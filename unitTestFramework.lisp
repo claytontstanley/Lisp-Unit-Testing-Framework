@@ -8,7 +8,8 @@
 ;;; Filename    : unitTestFramework.lisp
 ;;; Version     : 1.0
 ;;; 
-;;; Description : A Lisp-Based Unit Testing Framework. Most of the core was stolen from gigamonkeys.com UTF tutorial
+;;; Description : A Lisp-Based Unit Testing Framework. 
+;;;               Most of the core was stolen from gigamonkeys.com UTF tutorial
 ;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
