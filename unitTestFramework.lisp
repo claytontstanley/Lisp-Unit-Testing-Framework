@@ -11,7 +11,7 @@
 ;;; Description : A Lisp-Based Unit Testing Framework. 
 ;;;               Most of the core was stolen from gigamonkeys.com UTF tutorial
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+ 
 ;chains all of the test names (name in deftest) that have been defined
 ;in the hierarchy; used when printing documentation for a 'check' test
 (defvar *test-name* nil)
