@@ -9,7 +9,7 @@
 ;;; Version     : 1.0
 ;;; 
 ;;; Description : A Lisp-Based Unit Testing Framework. 
-;;;               Most of the core was stolen from gigamonkeys.com UTF tutorial
+;;;               Most of the core was taken from gigamonkeys.com UTF tutorial
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  
 ;chains all of the test names (name in deftest) that have been defined
@@ -29,14 +29,16 @@
  
 (defmacro deftest (name parameters &body body)
   "Define a test function. Within a test function we can call other test functions or use 'check' to run individual test cases."
-  (multiple-value-bind (forms decls doc) (sb-int::parse-body body)
-    `(defun ,name ,parameters
-       ,doc
-       ,@decls
-       (let ((*test-name* (append *test-name* (list ',name)))
-	     (*success* t))
-	 ,@forms
-	 *success*))))
+  (multiple-value-bind (forms decls doc)
+      #+:SBCL (sb-int:parse-body body)
+      #-:SBCL (values body nil nil)
+      `(defun ,name ,parameters
+	 ,doc
+	 ,@decls
+	 (let ((*test-name* (append *test-name* (list ',name)))
+	       (*success* t))
+	   ,@forms
+	   *success*))))
 
 (defmacro check (&body forms)
   "Run each expression in 'forms' as a test case."
