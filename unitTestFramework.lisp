@@ -21,6 +21,21 @@
 ;all the way up
 (defvar *success* t)
 
+(defmacro! with-shadow ((fname fun) &body body)
+  "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
+  (cond ((fboundp fname) ;if there is already a function with that name defined, then shadow it
+	 `(let ((,g!fname-orig (symbol-function ',fname)))
+	    (setf (symbol-function ',fname) ,fun)
+	    ,@body
+	    (setf (symbol-function ',fname) ,g!fname-orig)
+	    nil))
+	(t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
+	 `(progn
+	    (setf (symbol-function ',fname) ,fun)
+	    ,@body
+	    (fmakunbound ',fname)
+	    nil))))
+
 (defmacro runtests (&body tests)
   "top-level macro called to run a suite of tests"
   `(let ((*success* t))
