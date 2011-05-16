@@ -36,6 +36,13 @@
 	    (fmakunbound ',fname)
 	    nil))))
 
+(defmacro! errors-p (form)
+  `(handler-case
+       (progn
+	 ,form
+	 nil)
+     (error (,g!condition) ,g!condition)))
+
 (defmacro runtests (&body tests)
   "top-level macro called to run a suite of tests"
   `(let ((*success* t))
