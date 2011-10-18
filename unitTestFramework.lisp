@@ -24,10 +24,10 @@
 (defmacro! with-shadow ((fname fun) &body body)
   "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
   (cond ((fboundp fname) ;if there is already a function with that name defined, then shadow it
-	 `(let ((,g!fname-orig (symbol-function ',fname)))
+	 `(let ((fun-orig (symbol-function ',fname)))
 	    (setf (symbol-function ',fname) ,fun)
 	    ,@body
-	    (setf (symbol-function ',fname) ,g!fname-orig)
+	    (setf (symbol-function ',fname) fun-orig)
 	    nil))
 	(t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
 	 `(progn
