@@ -21,6 +21,9 @@
 ;all the way up
 (defvar *success* t)
 
+;chains all of the test names (name in deftest) that have ever been defined
+(defvar *all-tests* nil)
+
 (defmacro! with-shadow ((fname fun) &body body)
   "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
   (cond ((fboundp fname) ;if there is already a function with that name defined, then shadow it
@@ -44,23 +47,31 @@
      (error (,g!condition) ,g!condition)))
 
 (defmacro runtests (&body tests)
-  "top-level macro called to run a suite of tests"
+  "Top-level macro called to run a suite of tests
+  With this macro, you explicitly define each test that you want to run"
   `(let ((*success* t))
      (combine-results ,@tests)
      *success*))
+
+(defun run-all-tests ()
+  "Top-level function called to run a suite of tests
+  Runs all tests that have been defined using deftest"
+  (notany #'null (mapcar #'funcall *all-tests*)))
  
 (defmacro deftest (name parameters &body body)
   "Define a test function. Within a test function we can call other test functions or use 'check' to run individual test cases."
   (multiple-value-bind (forms decls doc)
       #+:SBCL (sb-int:parse-body body)
       #-:SBCL (values body nil nil)
-      `(defun ,name ,parameters
-	 ,doc
-	 ,@decls
-	 (let ((*test-name* (append *test-name* (list ',name)))
-	       (*success* t))
-	   ,@forms
-	   *success*))))
+      `(progn
+	 (defun ,name ,parameters
+	   ,doc
+	   ,@decls
+	   (let ((*test-name* (append *test-name* (list ',name)))
+		 (*success* t))
+	     ,@forms
+	     *success*))
+	 (push-to-end ',name *all-tests*))))
 
 (defmacro check (&body forms)
   "Run each expression in 'forms' as a test case."
