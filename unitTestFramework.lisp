@@ -24,6 +24,9 @@
 ;chains all of the test names (name in deftest) that have ever been defined
 (defvar *all-tests* nil)
 
+;keeps track of the number of check calls (tests) that have run for each test function
+(defvar *check-count* 0)
+
 (defmacro! build-capture (outputs fstr &body body)
 	   "captures the value of all output streams specified in outputs after evaluating body"
 	   (if outputs
@@ -86,9 +89,10 @@
 	 ,@decls
 	 (let ((*test-name* (append *test-name* (list ',name)))
 	       (*success* t)
+	       (*check-count* 0)
 	       (str))
 	   (setf str (capture-output nil ,@forms))
-	   (format t "Test: ~a: ~a~%" ',name *success*)
+	   (format t "Test: ~a, Num-Tests: ~a, Success: ~a~%" ',name *check-count* *success*)
 	   (unless *success*
 	     (format t "Stdout/Stderr for test:~%~a~%" str))
 	   *success*))
@@ -110,6 +114,7 @@
 	   "Report the results of a single test case. Called by 'check'."
 	   `(progn
 	      (format t "~:[FAIL~;pass~] ... ~a: ~a~%" ,g!result *test-name* ,form)
+	      (incf *check-count*)
 	      ,g!result))
 
 (defmacro runtests (&body tests)
