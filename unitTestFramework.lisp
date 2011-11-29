@@ -40,7 +40,7 @@
 	   `(let ((,g!fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t)))
 	      (build-capture ,outputs ,g!fstr ,@body)
 	      ,(if reprint
-		 `(format t ,g!fstr)
+		 `(format t "~a~%" ,g!fstr)
 		 `())
 	      ,g!fstr))
 
