@@ -28,55 +28,55 @@
 (defvar *check-count* 0)
 
 (defmacro! build-capture (outputs fstr &body body)
-	   "captures the value of all output streams specified in outputs after evaluating body"
-	   (if outputs
-	     `(with-output-to-string (,(car outputs) ,fstr)
-		(build-capture ,(cdr outputs) ,fstr ,@body))
-	     `(progn
-		,@body)))
+  "captures the value of all output streams specified in outputs after evaluating body"
+  (if outputs
+    `(with-output-to-string (,(car outputs) ,fstr)
+       (build-capture ,(cdr outputs) ,fstr ,@body))
+    `(progn
+       ,@body)))
 
 (defmacro! capture-outputs (reprint outputs &body body)
-	   "captures and reprints (if specified) all output streams in outputs after evaling body"
-	   `(let ((,g!fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t)))
-	      (build-capture ,outputs ,g!fstr ,@body)
-	      ,(if reprint
-		 `(format t "~a~%" ,g!fstr)
-		 `())
-	      ,g!fstr))
+  "captures and reprints (if specified) all output streams in outputs after evaling body"
+  `(let ((,g!fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t)))
+     (build-capture ,outputs ,g!fstr ,@body)
+     ,(if reprint
+        `(format t "~a~%" ,g!fstr)
+        `())
+     ,g!fstr))
 
 (defmacro! capture-standard-output (reprint &body body)
-	   "captures and reprints (if specified) *standard-output* after evaluating body"
-	   `(capture-outputs ,reprint (*standard-output*) ,@body))
+  "captures and reprints (if specified) *standard-output* after evaluating body"
+  `(capture-outputs ,reprint (*standard-output*) ,@body))
 
 (defmacro! capture-error-output (reprint &body body)
-	   "captures and reprints (if specified) *error-output* after evaluating body"
-	   `(capture-outputs ,reprint (*error-output*) ,@body))
+  "captures and reprints (if specified) *error-output* after evaluating body"
+  `(capture-outputs ,reprint (*error-output*) ,@body))
 
 (defmacro! capture-output (reprint &body body)
-	   "captures and reprints (if specified) stdout/stderr after evaluating body"
-	   `(capture-outputs ,reprint (*standard-output* *error-output*) ,@body))
+  "captures and reprints (if specified) stdout/stderr after evaluating body"
+  `(capture-outputs ,reprint (*standard-output* *error-output*) ,@body))
 
 (defmacro! with-shadow ((fname fun) &body body)
-	   "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
-	   (cond ((fboundp fname) ;if there is already a function with that name defined, then shadow it
-		  `(let ((fun-orig (symbol-function ',fname)))
-		     (setf (symbol-function ',fname) ,fun)
-		     ,@body
-		     (setf (symbol-function ',fname) fun-orig)
-		     nil))
-		 (t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
-		   `(progn
-		      (setf (symbol-function ',fname) ,fun)
-		      ,@body
-		      (fmakunbound ',fname)
-		      nil))))
+  "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
+  (cond ((fboundp fname) ;if there is already a function with that name defined, then shadow it
+         `(let ((fun-orig (symbol-function ',fname)))
+            (setf (symbol-function ',fname) ,fun)
+            ,@body
+            (setf (symbol-function ',fname) fun-orig)
+            nil))
+        (t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
+          `(progn
+             (setf (symbol-function ',fname) ,fun)
+             ,@body
+             (fmakunbound ',fname)
+             nil))))
 
 (defmacro! errors-p (form)
-	   `(handler-case
-	      (progn
-		,form
-		nil)
-	      (error (,g!condition) ,g!condition)))
+  `(handler-case
+     (progn
+       ,form
+       nil)
+     (error (,g!condition) ,g!condition)))
 
 (defmacro deftest (name parameters &body body)
   "Define a test function. Within a test function we can call other test functions or use 'check' to run individual test cases."
@@ -85,17 +85,17 @@
     #-:SBCL (values body nil nil)
     `(progn
        (defun ,name ,parameters
-	 ,doc
-	 ,@decls
-	 (let ((*test-name* (append *test-name* (list ',name)))
-	       (*success* t)
-	       (*check-count* 0)
-	       (str))
-	   (setf str (capture-output nil ,@forms))
-	   (format t "Test: ~a, Num-Tests: ~a, Success: ~a~%" ',name *check-count* *success*)
-	   (unless *success*
-	     (format t "Stdout/Stderr for test:~%~a~%" str))
-	   *success*))
+         ,doc
+         ,@decls
+         (let ((*test-name* (append *test-name* (list ',name)))
+               (*success* t)
+               (*check-count* 0)
+               (str))
+           (setf str (capture-output nil ,@forms))
+           (format t "Test: ~a, Num-Tests: ~a, Success: ~a~%" ',name *check-count* *success*)
+           (unless *success*
+             (format t "Stdout/Stderr for test:~%~a~%" str))
+           *success*))
        (push-to-end ',name *all-tests*))))
 
 (defmacro check (&body forms)
@@ -104,18 +104,18 @@
      ,@(loop for f in forms collect `(report-result ,f ',f))))
 
 (defmacro! combine-results (&body forms)
-	   "Combine the results (as booleans) of evaluating 'forms' in order."
-	   `(let ((,g!result t))
-	      ,@(loop for f in forms collect `(unless ,f (setf ,g!result nil)))
-	      (unless ,g!result (setf *success* nil))
-	      ,g!result))
+  "Combine the results (as booleans) of evaluating 'forms' in order."
+  `(let ((,g!result t))
+     ,@(loop for f in forms collect `(unless ,f (setf ,g!result nil)))
+     (unless ,g!result (setf *success* nil))
+     ,g!result))
 
 (defmacro! report-result (o!result form)
-	   "Report the results of a single test case. Called by 'check'."
-	   `(progn
-	      (format t "~:[FAIL~;pass~] ... ~a: ~a~%" ,g!result *test-name* ,form)
-	      (incf *check-count*)
-	      ,g!result))
+  "Report the results of a single test case. Called by 'check'."
+  `(progn
+     (format t "~:[FAIL~;pass~] ... ~a: ~a~%" ,g!result *test-name* ,form)
+     (incf *check-count*)
+     ,g!result))
 
 (defmacro runtests (&body tests)
   "Top-level macro called to run a suite of tests
