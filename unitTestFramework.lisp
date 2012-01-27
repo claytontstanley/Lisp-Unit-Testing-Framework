@@ -58,18 +58,21 @@
 
 (defmacro! with-shadow ((fname fun) &body body)
   "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
-  (cond ((fboundp fname) ;if there is already a function with that name defined, then shadow it
-         `(let ((fun-orig (symbol-function ',fname)))
+  `(let ((,g!res)
+         (fun-orig))
+     (cond ((fboundp ',fname) ;if there is already a function with that name defined, then shadow it
+            (setf fun-orig (symbol-function ',fname))
             (setf (symbol-function ',fname) ,fun)
-            ,@body
+            (setf ,g!res (progn ,@body))
             (setf (symbol-function ',fname) fun-orig)
-            nil))
-        (t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
-          `(progn
+            (values))
+           (t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
+             (setf fun-orig #'identity)
              (setf (symbol-function ',fname) ,fun)
-             ,@body
+             (setf ,g!res (progn ,@body))
              (fmakunbound ',fname)
-             nil))))
+             (values)))
+     ,g!res))
 
 (defmacro! errors-p (form)
   `(handler-case
