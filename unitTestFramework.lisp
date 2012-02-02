@@ -74,6 +74,13 @@
              (values)))
      ,g!res))
 
+(defmacro with-shadows (shadows &body body)
+  "Used to shadow multiple functions; each element in shadows is a function name / lambda pair that is passed to with-shadow"
+  (if shadows
+    `(with-shadow ,(car shadows)
+       (with-shadows ,(cdr shadows) ,@body))
+    `(progn ,@body)))
+
 (defmacro! errors-p (form)
   `(handler-case
      (progn
