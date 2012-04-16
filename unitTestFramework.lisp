@@ -21,6 +21,10 @@
 ;all the way up
 (defvar *success* t)
 
+;If set to t, stdout/stderr for all tests (pass and fail) will be printed.
+;If set to nil, only stdout/stderr for failed tests will be printed.
+(defvar *utf-verbose* nil)
+
 ;chains all of the test names (name in deftest) that have ever been defined
 (defvar *all-tests* nil)
 
@@ -103,7 +107,7 @@
                (str))
            (setf str (capture-output nil ,@forms))
            (format t "Test: ~a, Num-Tests: ~a, Success: ~a~%" ',name *check-count* *success*)
-           (unless *success*
+           (when (or (not *success*) *utf-verbose*)
              (format t "Stdout/Stderr for test:~%~a~%" str))
            *success*))
        (push-to-end ',name *all-tests*))))
