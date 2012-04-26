@@ -42,11 +42,11 @@
 (defmacro! capture-outputs (reprint outputs &body body)
   "captures and reprints (if specified) all output streams in outputs after evaling body"
   `(let ((,g!fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t)))
-     (build-capture ,outputs ,g!fstr ,@body)
-     ,(if reprint
-        `(format t "~a~%" ,g!fstr)
-        `())
-     ,g!fstr))
+     (unwind-protect (build-capture ,outputs ,g!fstr ,@body)
+       ,(if reprint
+          `(format t "~a~%" ,g!fstr)
+          `())
+       ,g!fstr)))
 
 (defmacro! capture-standard-output (reprint &body body)
   "captures and reprints (if specified) *standard-output* after evaluating body"
