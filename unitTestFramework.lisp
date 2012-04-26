@@ -45,8 +45,8 @@
      (unwind-protect (build-capture ,outputs ,g!fstr ,@body)
        ,(if reprint
           `(format t "~a~%" ,g!fstr)
-          `())
-       ,g!fstr)))
+          `()))
+       ,g!fstr))
 
 (defmacro! capture-standard-output (reprint &body body)
   "captures and reprints (if specified) *standard-output* after evaluating body"
