@@ -31,22 +31,23 @@
 ;keeps track of the number of check calls (tests) that have run for each test function
 (defvar *check-count* 0)
 
-(defmacro! build-capture (outputs fstr &body body)
+(defmacro! build-capture (outputs fstr success &body body)
   "captures the value of all output streams specified in outputs after evaluating body"
   (if outputs
     `(with-output-to-string (,(car outputs) ,fstr)
-       (build-capture ,(cdr outputs) ,fstr ,@body))
+       (build-capture ,(cdr outputs) ,fstr ,success ,@body))
     `(progn
-       ,@body)))
+       ,@body
+       (setf ,success t))))
 
 (defmacro! capture-outputs (reprint outputs &body body)
   "captures and reprints (if specified) all output streams in outputs after evaling body"
-  `(let ((,g!fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t)))
-     (unwind-protect (build-capture ,outputs ,g!fstr ,@body)
-       ,(if reprint
-          `(format t "~a~%" ,g!fstr)
-          `()))
-       ,g!fstr))
+  `(let ((,g!fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t))
+         (,g!success nil))
+     (unwind-protect (build-capture ,outputs ,g!fstr ,g!success ,@body)
+       (if (or ,reprint (not ,g!success))
+         (format t "~a~%" ,g!fstr)))
+     ,g!fstr))
 
 (defmacro! capture-standard-output (reprint &body body)
   "captures and reprints (if specified) *standard-output* after evaluating body"
