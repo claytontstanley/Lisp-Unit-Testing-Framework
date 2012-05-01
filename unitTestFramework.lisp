@@ -86,12 +86,12 @@
        (with-shadows ,(cdr shadows) ,@body))
     `(progn ,@body)))
 
-(defmacro! errors-p (form)
+(defmacro errors-p (form &key (on-error `(format t "error: ~a~%" condition)))
   `(handler-case
-     (progn
-       ,form
-       nil)
-     (error (,g!condition) ,g!condition)))
+     (progn ,form nil)
+     (error (condition)
+            ,on-error
+            condition)))
 
 (defmacro deftest (name parameters &body body)
   "Define a test function. Within a test function we can call other test functions or use 'check' to run individual test cases."
