@@ -72,11 +72,11 @@
             (setf (symbol-function ',fname) fun-orig)
             (values))
            (t ;otherwise, define a new function with that name, and then undo the operation afterwards by unbinding that function
-             (setf fun-orig #'identity)
-             (setf (symbol-function ',fname) ,fun)
-             (setf ,g!res (progn ,@body))
-             (fmakunbound ',fname)
-             (values)))
+            (setf fun-orig #'identity)
+            (setf (symbol-function ',fname) ,fun)
+            (setf ,g!res (progn ,@body))
+            (fmakunbound ',fname)
+            (values)))
      ,g!res))
 
 (defmacro with-shadows (shadows &body body)
