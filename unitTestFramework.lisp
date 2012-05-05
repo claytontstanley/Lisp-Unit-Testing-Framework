@@ -134,19 +134,19 @@
 
 (defmacro runtests (&body tests)
   "Top-level macro called to run a suite of tests
-  With this macro, you explicitly define each test that you want to run"
+   With this macro, you explicitly define each test that you want to run"
   `(let ((*success* t))
      (combine-results ,@tests)
      *success*))
 
 (defun run-all-tests ()
   "Top-level function called to run a suite of tests
-  Runs all tests that have been defined using deftest"
+   Runs all tests that have been defined using deftest"
   (notany #'null (mapcar #'funcall *all-tests*)))
 
 (defun test-suite ()
   "Unit tests for the lisp code; will return t only if all unit tests pass; nil otherwise.
-  All deftest-mm defined tests are collected in *all-tests*, and all of these will be run here.
-  This means that any lisp code with unit tests that is loaded before calling test-suite, will
-  have their tets registered in *all-tests*, and will be run when test-suite is called"
+   All deftest-mm defined tests are collected in *all-tests*, and all of these will be run here.
+   This means that any lisp code with unit tests that is loaded before calling test-suite, will
+   have their tets registered in *all-tests*, and will be run when test-suite is called"
   (format t "~%overall: ~:[FAIL~;pass~]~%" (run-all-tests)))
