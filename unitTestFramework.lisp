@@ -62,7 +62,8 @@
   `(capture-outputs ,reprint (*standard-output* *error-output*) ,@body))
 
 (defmacro! with-shadow ((fname fun) &body body)
-  "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
+  "Shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname.
+   This macro is intentionally unhygienic. fun-orig is the anaphor, and can be used in body to access the shadowed function"
   `(let ((fun-orig))
      (cond ((fboundp ',fname) ;if there is already a function with that name defined, then shadow it
             (setf fun-orig (symbol-function ',fname))
