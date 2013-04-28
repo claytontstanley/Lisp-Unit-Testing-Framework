@@ -31,6 +31,9 @@
 ;keeps track of the number of check calls (tests) that have run for each test function
 (defvar *check-count* 0)
 
+; If set, code will throw an exception immediately after a failed test
+(defparameter *break-on-fail-p* nil)
+
 (defmacro! build-capture (outputs fstr success &body body)
   "captures the value of all output streams specified in outputs after evaluating body"
   (if outputs
@@ -125,6 +128,9 @@
   "Report the results of a single test case. Called by 'check'."
   `(progn
      (format t "~:[FAIL~;pass~] ... ~a: ~a~%" ,g!result *test-name* ,form)
+     (unless ,g!result
+       (when *break-on-fail-p*
+         (error "Failed unit test")))
      (incf *check-count*)
      ,g!result))
 
